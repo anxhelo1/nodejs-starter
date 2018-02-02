@@ -3,6 +3,9 @@ const {DATABASE} = require('./config/keys');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
+const morgan = require('morgan');
+const cors = require('cors');
+
 const app = express();
 
 mongoose.Promise = global.Promise;
@@ -10,20 +13,17 @@ mongoose.connect(DATABASE).then(() => {
     console.log('connected to db!');
 });
 
-//middleware
-app.use(bodyParser.json());
-
+//body parser for parsing JSON requests
+app.use(bodyParser.json({type: "*/*"}));
+//logger middleware
+app.use(morgan('combined'));
+//enable cors
+app.use(cors());
 //routes
 userRoutes(app);
-
-//dummy route
-app.get('/ping', (req, res) => {
-    res.send('pong');
-});
-
 //error handling middleware
 app.use((err, req, res, next) => {
-    res.status(500).send({error: "Internal error!"});
+    res.status(500).send({error: "Internal error"});
 });
 
 module.exports = app;

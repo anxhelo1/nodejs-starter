@@ -14,16 +14,18 @@ mongoose.connect(DATABASE).then(() => {
 });
 
 //body parser for parsing JSON requests
-app.use(bodyParser.json({type: "*/*"}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true, limit: "5mb", parameterLimit: 100000}));
+
 //logger middleware
-app.use(morgan('combined'));
+app.use(morgan('dev'));
 //enable cors
 app.use(cors());
 //routes
 userRoutes(app);
 //error handling middleware
 app.use((err, req, res, next) => {
-    res.status(500).send({error: "Internal error"});
+    res.status(422).send({error: err.message});
 });
 
 module.exports = app;

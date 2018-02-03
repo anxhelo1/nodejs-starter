@@ -18,21 +18,25 @@ module.exports = {
         if (!user) {
             //hash password and save user
             const hash = await bcrypt.hash(password, SALT_ROUNDS).catch(next);
-            const newUser = await User.create({username, password: hash}).catch(next);
+            const newUser = await User.create(
+                {
+                    username,
+                    password: hash,
+                    avatar: req.file.filename
+                }).catch(next);
             //return new user
             res.json(newUser);
         }
-        //username exists!
-        res.status(400).json({error: "username already exists"});
+        else {
+            next(new Error("username already exists"));
+        }
     },
     //sign in route
     async login(req, res, next) {
         const {username, password} = req.body;
-
         const user = await User.findOne({username}).catch(next);
         if (user) {
             user.comparePassword(password, (error, isMatch) => {
-                console.log(error);
                 if (error) {
                     next(error);
                 }
@@ -41,7 +45,7 @@ module.exports = {
                 }
                 const timestamp = new Date().getTime();
                 const token = jwt.encode({id: user.id, iat: timestamp}, JWT_SECRET_KEY);
-                res.status(200).json({token});
+                res.status(200).json({token, user});
             });
         } else {
             res.status(400).json({error: 'invalid username/password combination'});

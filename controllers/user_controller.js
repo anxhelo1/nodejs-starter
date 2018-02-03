@@ -5,9 +5,9 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
 
-    //dummy route
-    secret(req, res, next) {
-      res.json("secret code");
+    currentUser(req, res, next) {
+        //user is already injected by passport middleware
+        res.json({user: req.user});
     },
     //add user route
     async register(req, res, next) {

@@ -7,5 +7,5 @@ module.exports = app => {
     app.post('/user', UserController.register);
     app.post('/login', UserController.login);
     //dummy route to test authentication
-    app.get('/secret',passport.authenticate('jwt', {session: false}), UserController.secret);
+    app.get('/current_user',passport.authenticate('jwt', {session: false}), UserController.currentUser);
 };
